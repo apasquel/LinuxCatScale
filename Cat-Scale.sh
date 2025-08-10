@@ -1,10 +1,10 @@
-#!/bin/bash
+# Cat-Scale Linux Collection Script 2025 Update
+# Updated by Austin Pasquel
+# Last Updated: 4/22/2025
+# Forked off of version 1.3.1. 
+# Change Log: Formating issues & command options updated
 #
-# Cat-Scale Linux Collection Script
-# Version: 1.3.1
-# Release Date: 2021-11-30
-#
-# Latest public release available at https://github.com/FSecureLABS/LinuxCatScale
+# Original FSecureLABS latest public release available at https://github.com/FSecureLABS/LinuxCatScale
 #
 # Instructions:
 # 1. Ensure the script is executable, run "chmod +x <script_name>"
@@ -19,7 +19,6 @@
 # The script does this by executing local binaries on your system. It does not install or drop any binaries on your system or change configurations. 
 # This script may alter forensic artefacts, it is not recommended where evidence preservation is important.
 #
-
 ######################################################################################################
 ############################################ Global Variables ########################################
 ######################################################################################################
@@ -229,7 +228,7 @@ get_procinfo_GNU(){ #Production
 
 	if which lsof &>/dev/null; then
 
-		lsof +c0 -M -R -V -w -n -P -e /run/user/1000/gvfs > $OUTROOT/$OUTDIR/Process_and_Network/$OUTFILE-lsof-list-open-files.txt
+		lsof +c0 -M -R -V -w -n -P > $OUTROOT/$OUTDIR/Process_and_Network/$OUTFILE-lsof-list-open-files.txt
 
   fi
 
@@ -355,7 +354,7 @@ get_config_GNU(){ #Production
 	files="( -iname yum* -o -iname apt* -o -iname hosts* -o -iname passwd \
 	-o -iname sudoers* -o -iname cron* -o -iname ssh* -o -iname rc* -o -iname systemd* -o -iname anacron  \
 	-o -iname inittab -o -iname init.d -o -iname profile* -o -iname bash* )"
-    find /etc/ -type f,d $files -print0 | xargs -0 tar -czvf $OUTROOT/$OUTDIR/System_Info/$OUTFILE-etc-key-files.tar.gz 2>/dev/null > $OUTROOT/$OUTDIR/System_Info/$OUTFILE-etc-key-files-list.txt
+    find /etc/ -type f $files -print0 | xargs -0 tar -czvf $OUTROOT/$OUTDIR/System_Info/$OUTFILE-etc-key-files.tar.gz 2>/dev/null > $OUTROOT/$OUTDIR/System_Info/$OUTFILE-etc-key-files-list.txt
     
     # Get files that were modified in the last 90 days, collect all files, including symbolic links
     find /etc/ -type f -mtime -90 -print0 | xargs -0 tar -czvf $OUTROOT/$OUTDIR/System_Info/$OUTFILE-etc-modified-files.tar.gz --dereference --hard-dereference 2>/dev/null > $OUTROOT/$OUTDIR/System_Info/$OUTFILE-etc-modified-files-list.txt
@@ -492,8 +491,8 @@ get_systeminfo_GNU(){ #Production
 	sudo -V > $OUTROOT/$OUTDIR/System_Info/$OUTFILE-sudo.txt
 
 	echo "      Collecting dmesg..."
-	dmesg -T > $OUTROOT/$OUTDIR/System_Info/$OUTFILE-dmesg.txt
-
+	dmesg --ctime > $OUTROOT/$OUTDIR/System_Info/$OUTFILE-dmesg.txt
+	dmesg > $OUTROOT/$OUTDIR/System_Info/$OUTFILE-dmesg-epoc.txt
 
 }
 get_systeminfo_Solaris(){ #Production
@@ -676,9 +675,6 @@ get_cron_Solaris(){ #Production
 
 }
 
-
-
-
 #
 # Find all files with execution permissions. 
 #
@@ -707,7 +703,7 @@ get_suspicios_data(){ #Production
 # 
 get_pot_webshell(){ #Production
     
-    find / -type f \( -iname '*.jsp' -o -iname '*.asp' -o -iname '*.php' -o -iname '*.aspx' \) 2>/dev/null -print0 | xargs -0 sha1sum > $OUTROOT/$OUTDIR/Misc/$OUTFILE-pot-webshell-hashes.txt
+    find / -type f \( -iname '*.jsp' -o -iname '*.asp' -o -iname '*.php' -o -iname '*.aspx'  \) 2>/dev/null -print0 | xargs -0 sha1sum > $OUTROOT/$OUTDIR/Misc/$OUTFILE-pot-webshell-hashes.txt
     
     find / -type f \( -iname '*.jsp' -o -iname '*.asp' -o -iname '*.php' -o -iname '*.aspx' \) 2>/dev/null -print0 | xargs -0 head -1000 > $OUTROOT/$OUTDIR/Misc/$OUTFILE-pot-webshell-first-1000.txt
     
