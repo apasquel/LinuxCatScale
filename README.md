@@ -1,6 +1,9 @@
 # Linux-CatScale IR Collection Script 
 
-Linux CatScale is a bash script that uses live of the land tools to collect extensive data from Linux based hosts. The data aims to help DFIR professionals triage and scope incidents. An Elk Stack instance also is configured to consume the output and assist the analysis process. 
+Linux CatScale is a bash script that uses living off the land tools to collect extensive data from Linux based hosts. The data aims to help DFIR, Threat Hunters, and Blue Team professionals triage and scope incidents. An ELK Stack logstash conf is provided to consume the output and assist the analysis process. 
+
+## Attention
+📢 This version of Cat-Scale is an updated fork of the original project by FSecure. This version includes bug fixes and updates deprecated bash options to improve reliability and functionality. 
 
 - [Usage](#usage)
 - [Parsing](#parsing)
@@ -8,21 +11,20 @@ Linux CatScale is a bash script that uses live of the land tools to collect exte
 - [Disclaimer](#disclaimer)
 - [Tested OSes](#tested-oses)
 
-
 ## Usage
 
-This scripts were built to automate as much as possible. We recommend running it from an external device/usb to avoid overwriting evidence. Just in case you need a full image in future. 
+This scripts were built to automate as much as possible. For forensic captures, it is recommended to run this from an external drive or usb to minimize impact to the target system. However, it can be run over SSH against remote hosts.  
 
-Please run the collection script on suspected hosts with sudo rights. fsecure_incident-response_linux_collector_0.7.sh the only file you need to run the collection. 
+Please run the collection script on suspected hosts with sudo rights. Cat-Scale.sh is the only file you need. 
 
 ```
 user@suspecthost:<dir>$ chmod +x ./Cat-Scale.sh
 user@suspecthost:<dir>$ sudo ./Cat-Scale.sh 
 ```
 
-The script will create a directory called "FSecure-out" in the working directory and should remove all artefacts after being compressed. This will leave a filename in the format of `FSecure_Hostname-YYMMDD-HHMM.tar.gz` 
+The script will create a directory called "CatScale-out" in the working directory and should remove all artefacts after being compressed. This will leave a filename in the format of `Hostname-YYMMDD-HHMM.tar.gz` 
 
-Once these are all aggregated and you have the `FSecure_Hostname-YYMMDD-HHMM.tar.gz` on the analysis machine. You can run Extract-Cat-Scale.sh which will extract all the files and place them in a folder called "extracted".
+Once these are all aggregated and you have the `Hostname-YYMMDD-HHMM.tar.gz` on the analysis machine. You can run Extract-Cat-Scale.sh which will extract all the files and place them in a folder called "extracted".
 
 ```
 user@analysishost:<dir>$ chmod +x ./Extract-Cat-Scale.sh
@@ -33,19 +35,18 @@ user@analysishost:<dir>$ sudo ./Extract-Cat-Scale.sh
 
 This project has predefined grok filters to ingest data into elastic, feel free to modify them as you need. 
 
-
 ## What does it collect?
 
 This script will produce output and archive. Currently most up to date what it collects is covered in the blog post here: https://labs.withsecure.com/tools/cat-scale-linux-incident-response-collection
 
 ## Disclaimer
 
-Note that the script will likely alter artefacts on endpoints. Care should be taken when using the script. This is not meant to take forensically sound disk images of the remote endpoints.
-
+Note that the script will likely alter artifacts on endpoints. Care should be taken when using the script. This is not meant to take forensically sound disk images of the remote endpoints. However the script can be used for triage and threat hunting purposes. 
 
 ## Tested OSes
 
 - Ubuntu 16.4
-- Centos
+- Red Hat Enterprise Linux 8
+- Centos/Rocky 
 - Mint
 - Solaris 11.4
