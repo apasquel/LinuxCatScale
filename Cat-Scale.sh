@@ -26,8 +26,9 @@
 function usage {
 cat << EOF
 
-Usage: sudo $0 [ -d OUTDIR ] [ -f OUTFILE ] [ -o OUTROOT ] [ -p OUTFILE_PREFIX ]
+Usage: sudo $0 [ -a ] [ -d OUTDIR ] [ -f OUTFILE ] [ -o OUTROOT ] [ -p OUTFILE_PREFIX ]
 
+ -a	All, Optional, Sets the flag to verify all install packages. Only use when connected to the internet. 
  -d	OUTDIR, Optional, Directory where output will be staged while running CatScale. Overwrites default, which is "catscale_out" 
  -f	OUTFILE, Optional, Name of resultant archive file created by CatScale (.tar.gz will be appended by the script). Overwrites default, which has the format of "catscale_<Hostname>-<DateAndTime>"
  -o	OUTROOT, Optional, Root directory/filesystem for output to be saved. Overwrites default, which is set to current directory script is running from, $(pwd). 
@@ -36,7 +37,9 @@ Usage: sudo $0 [ -d OUTDIR ] [ -f OUTFILE ] [ -o OUTROOT ] [ -p OUTFILE_PREFIX ]
 EOF
 }
 
-while getopts "d:f:o:p:h" OPTION
+All = false
+
+while getopts "d:f:o:p:h:a" OPTION
 do
     case $OPTION in
         h)
@@ -55,6 +58,10 @@ do
         p)
             OUTFILE_PREFIX=$OPTARG
             ;;
+        a)
+            All=true
+            ;;
+
         *)
             usage
             exit 0
@@ -123,7 +130,7 @@ starttheshow(){ #Production
 	echo " *  ╚═════╝╚═╝  ╚═╝   ╚═╝         ╚══════╝ ╚═════╝╚═╝  ╚═╝╚══════╝╚══════╝    =============   *"
 	echo " *                                  Linux Collection                                          *"
 	echo " **********************************************************************************************"
-    
+	echo $All
 	# Exit if $OUTDIR folder exists.
 	if [ -d $OUTROOT/$OUTDIR ]; then
 	 echo " "
@@ -606,7 +613,7 @@ get_packageinfo_Solaris(){ #Production
 #
 vrfy_packageinfo_GNU(){ #Production
 
-	echo "      Verifying installed package info..."
+	echo "      Verifying installed package info... can take some time"
 	if which dpkg &>/dev/null; then
 		dpkg -V > $OUTROOT/$OUTDIR/System_Info/$OUTFILE-deb-package-verify.txt
 	else 
@@ -616,7 +623,7 @@ vrfy_packageinfo_GNU(){ #Production
 }
 vrfy_packageinfo_Solaris(){ #Production
 
-	echo "      Verifying installed package info..."
+	echo "      Verifying installed package info...  can take some time"
 	pkg verify -v > $OUTROOT/$OUTDIR/System_Info/$OUTFILE-solaris-package-verify.txt
 	
 }
@@ -775,10 +782,13 @@ case $oscheck in
 			get_docker_info
 			echo " - Installed Packages..."
 			get_packageinfo_GNU
-			vrfy_packageinfo_GNU
+			if [ "$All" = "true" ]; then 
+				vrfy_packageinfo_GNU
+				echo "TEST WIN"
+			fi
 			echo " - Configuration Files..." 
 			get_config_GNU
-			echo " - File timeline..."
+			echo " - File timeline... can take some time"
 			get_find_timeline
 			echo " - .ssh folder..."
 			get_sshkeynhosts
@@ -815,10 +825,13 @@ case $oscheck in
 			get_docker_info
 			echo " - Installed Packages..."
 			get_packageinfo_GNU
-			vrfy_packageinfo_GNU
+			if [ "$All" = "true" ]; then : 
+				vrfy_packageinfo_GNU
+				echo "TEST WIN"
+			fi
 			echo " - Configuration Files..." 
 			get_config_GNU
-			echo " - File timeline..."
+			echo " - File timeline... can take some time"
 			get_find_timeline
 			echo " - .ssh folder..."
 			get_sshkeynhosts
@@ -854,10 +867,13 @@ case $oscheck in
 			get_docker_info
 			echo " - Installed Packages..."
 			get_packageinfo_Solaris
-			vrfy_packageinfo_Solaris
+			if [ "$All" = "true"]; then : 
+				vrfy_packageinfo_Solaris
+				echo "TEST WIN"
+			fi
 			echo " - Configuration Files..." 
 			get_config_Solaris
-			echo " - File timeline..."
+			echo " - File timeline... can take some time"
 			get_find_timeline
 			echo " - .ssh folder..."
 			get_sshkeynhosts
@@ -894,7 +910,7 @@ case $oscheck in
 			get_packageinfo_GNU
 			echo " - Configuration Files..." 
 			get_config_GNU
-			echo " - File timeline..."
+			echo " - File timeline... can take some time"
 			get_find_timeline
 			echo " - .ssh folder..."
 			get_sshkeynhosts
